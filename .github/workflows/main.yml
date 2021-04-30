@@ -1,0 +1,32 @@
+name: CI e CD
+
+on:
+  push:
+    branches: [ master ]
+
+  workflow_dispatch:
+
+jobs:
+  CI:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Docker Login
+        uses: docker/login-action@v1.9.0
+        with:
+          username: ${{secrects.DOCKER_USER}}
+          password: ${{secrets.DOCKER_PWD}}
+      
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v2.4.0
+        with:
+          context: ./src/
+          file: ./src/Dockerfile
+          push: true
+          tags: |
+            viniciusgalli/api-produtos-k8s:latest
+            viniciusgalli/api-produtos-k8s:${{github.run_number}}
+      
+      
